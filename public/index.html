@@ -1,40 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rick and Morty Characters</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="/style.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
+
 <body>
-    <h1>Listagem de Personagens</h1>
+    <div class="container">
+        <h1>Listagem de Personagens</h1>
 
-    <form id="character-search-form">
-        <input type="text" id="name" placeholder="Nome">
-        <select id="status">
-            <option value="">Status</option>
-            <option value="alive">Alive</option>
-            <option value="dead">Dead</option>
-            <option value="unknown">Unknown</option>
-        </select>
-        <select id="gender">
-            <option value="">Gênero</option>
-            <option value="female">Female</option>
-            <option value="male">Male</option>
-            <option value="genderless">Genderless</option>
-            <option value="unknown">Unknown</option>
-        </select>
-        <button type="submit">Buscar</button>
-    </form>
+        <!-- Componente de Busca -->
+        <form id="character-search-form">
+            <input type="text" id="name" placeholder="Nome">
+            <select id="status">
+                <option value="">Status</option>
+                <option value="alive">Alive</option>
+                <option value="dead">Dead</option>
+                <option value="unknown">Unknown</option>
+            </select>
+            <select id="gender">
+                <option value="">Gênero</option>
+                <option value="female">Female</option>
+                <option value="male">Male</option>
+                <option value="genderless">Genderless</option>
+                <option value="unknown">Unknown</option>
+            </select>
+            <button type="submit">Buscar</button>
+        </form>
 
-    <ul id="character-list">
-    </ul>
+        <!-- Lista de Personagens -->
+        <ul id="character-list">
+            <!-- Aqui serão exibidos os personagens -->
+        </ul>
 
-    <div id="pagination">
+        <!-- Paginação -->
+        <div id="pagination">
+            <!-- Botões de paginação aqui -->
+        </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="/script.js"></script>
 </body>
+
 </html>

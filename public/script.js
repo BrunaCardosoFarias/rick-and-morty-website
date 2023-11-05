@@ -3,13 +3,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const characterSearchForm = document.getElementById("character-search-form");
     const pagination = document.getElementById("pagination");
     const API_URL = "https://rickandmortyapi.com/api/character";
+    const characterDetails = document.getElementById("character-details");
 
     let currentPage = 1;
     const charactersPerPage = 10;
 
-    function fetchCharacters(page = 1) {
-        const url = `${API_URL}?page=${page}`;
-        axios.get(url)
+    function fetchAndDisplayCharacters(page = 1, name, status, gender) {
+        const searchURL = `${API_URL}?page=${page}` +
+            (name ? `&name=${name}` : "") +
+            (status ? `&status=${status}` : "") +
+            (gender ? `&gender=${gender}` : "");
+
+        axios.get(searchURL)
             .then(response => {
                 const characters = response.data.results;
                 if (characters.length === 0) {
@@ -20,10 +25,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             })
             .catch(error => {
-                if (error.response.status == 404) {
+                if (error.response && error.response.status == 404) {
                     displayNoCharacterFound();
-                }
-                else {
+                } else {
                     console.error(error);
                     characterList.innerHTML = "<p>Erro ao buscar personagens. Tente novamente mais tarde.</p>";
                     pagination.innerHTML = "";
@@ -31,16 +35,26 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
+    characterSearchForm?.addEventListener("submit", event => {
+        event.preventDefault();
+        const name = document.getElementById("name").value;
+        const status = document.getElementById("status").value;
+        const gender = document.getElementById("gender").value;
+
+        fetchAndDisplayCharacters(1, name, status, gender);
+    });
+
     function displayCharacters(characters) {
         characterList.innerHTML = ""; // Limpa a lista de personagens
         characters.forEach(character => {
             const li = document.createElement("li");
             li.innerHTML = `
-                <h3>${character.name}</h3>
-                <p>Status: ${character.status}</p>
-                <p>Gênero: ${character.gender}</p>
-                <a href="/character/${character.id}">Detalhes</a>
-            `;
+            <h3>${character.name}</h3>
+            <img src="${character.image}" alt="Imagem do Personagem">
+            <p>Status: ${character.status}</p>
+            <p>Gênero: ${character.gender}</p>
+            <a href="/character/${character.id}">Detalhes</a>
+        `;
             characterList.appendChild(li);
         });
     }
@@ -68,6 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function createPageButton(label, page) {
         const button = document.createElement("button");
+        button.setAttribute("class", "btn btn-secondary btn-sm mr-2");
         button.textContent = label;
 
         if (page < 1) {
@@ -76,7 +91,16 @@ document.addEventListener("DOMContentLoaded", function () {
             button.addEventListener("click", () => {
                 if (page !== currentPage) {
                     currentPage = page;
-                    fetchCharacters(page);
+                    const name = document.getElementById("name").value;
+                    const status = document.getElementById("status").value;
+                    const gender = document.getElementById("gender").value;
+
+                    fetchAndDisplayCharacters(page, name, status, gender);
+
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth' // Rolamento suave 😎
+                    });
                 }
             });
         }
@@ -84,38 +108,31 @@ document.addEventListener("DOMContentLoaded", function () {
         return button;
     }
 
-    characterSearchForm.addEventListener("submit", event => {
-        event.preventDefault();
-        const name = document.getElementById("name").value;
-        const status = document.getElementById("status").value;
-        const gender = document.getElementById("gender").value;
+    // Lógica para a página de detalhes do personagem
+    if (window.location.pathname.startsWith("/character/")) {
+        const characterId = window.location.pathname.split("/character/")[1];
+        fetchCharacterDetails(characterId);
+    }
 
-        const searchURL = `${API_URL}?page=1` +
-            (name ? `&name=${name}` : "") +
-            (status ? `&status=${status}` : "") +
-            (gender ? `&gender=${gender}` : "");
-
-        axios.get(searchURL)
+    function fetchCharacterDetails(id) {
+        const url = `${API_URL}/${id}`;
+        axios.get(url)
             .then(response => {
-                const characters = response.data.results;
-                if (characters.length === 0) {
-                    displayNoCharacterFound();
-                } else {
-                    displayCharacters(characters);
-                    displayPagination(response.data.info);
-                }
+                const character = response.data;
+                displayCharacterDetails(character);
             })
             .catch(error => {
-                if (error.response.status == 404) {
-                    displayNoCharacterFound();
-                }
-                else {
-                    console.error(error);
-                    characterList.innerHTML = "<p>Erro ao buscar personagens. Tente novamente mais tarde.</p>";
-                    pagination.innerHTML = "";
-                }
+                console.error(error);
+                characterDetails.innerHTML = "<p>Erro ao buscar detalhes do personagem. Tente novamente mais tarde.</p>";
             });
-    });
+    }
 
-    fetchCharacters();
+    function displayCharacterDetails(character) {
+        document.getElementById("character-img").setAttribute("src", character.image);
+        document.getElementById("character-name").textContent = character.name;
+        document.getElementById("character-status").textContent = `Status: ${character.status}`;
+        document.getElementById("character-gender").textContent = `Gênero: ${character.gender}`;
+        document.getElementById("character-species").textContent = `Espécie: ${character.species}`;
+        document.getElementById("character-location").textContent = `Localização: ${character.location.name}`;
+    }
 });
