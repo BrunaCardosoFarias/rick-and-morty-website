@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rick and Morty Characters</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./style.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>Listagem de Personagens</h1>
+
+    <form id="character-search-form">
+        <input type="text" id="name" placeholder="Nome">
+        <select id="status">
+            <option value="">Status</option>
+            <option value="alive">Alive</option>
+            <option value="dead">Dead</option>
+            <option value="unknown">Unknown</option>
+        </select>
+        <select id="gender">
+            <option value="">Gênero</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+            <option value="genderless">Genderless</option>
+            <option value="unknown">Unknown</option>
+        </select>
+        <button type="submit">Buscar</button>
+    </form>
+
+    <ul id="character-list">
+    </ul>
+
+    <div id="pagination">
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
