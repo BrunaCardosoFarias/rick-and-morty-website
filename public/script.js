@@ -2,14 +2,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const characterList = document.getElementById("character-list");
     const characterSearchForm = document.getElementById("character-search-form");
     const pagination = document.getElementById("pagination");
-    const API_URL = "https://rickandmortyapi.com/api/character";
+    const API_URL = "https://rickandmortyapi.com/api/";
     const characterDetails = document.getElementById("character-details");
 
     let currentPage = 1;
     const charactersPerPage = 10;
 
     function fetchAndDisplayCharacters(page = 1, name, status, gender) {
-        const searchURL = `${API_URL}?page=${page}` +
+        const searchURL = `${API_URL}/character?page=${page}` +
             (name ? `&name=${name}` : "") +
             (status ? `&status=${status}` : "") +
             (gender ? `&gender=${gender}` : "");
@@ -115,11 +115,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function fetchCharacterDetails(id) {
-        const url = `${API_URL}/${id}`;
-        axios.get(url)
+        const characterUrl = `${API_URL}/character/${id}`;
+        axios.get(characterUrl)
             .then(response => {
                 const character = response.data;
-                displayCharacterDetails(character);
+                const episodeUrls = character.episode; // Array de URLs de episódios
+                fetchEpisodeDetails(episodeUrls, character);
             })
             .catch(error => {
                 console.error(error);
@@ -127,12 +128,42 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-    function displayCharacterDetails(character) {
+    async function fetchEpisodeDetails(episodeUrls, character) {
+        const episodeDetails = [];
+
+        // Função para buscar detalhes de um episódio
+        async function fetchEpisodeDetail(episodeUrl) {
+            try {
+                const response = await axios.get(episodeUrl);
+                episodeDetails.push(response.data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        const promises = episodeUrls.map(fetchEpisodeDetail);
+        await Promise.all(promises);
+
+        // Agora que você tem os detalhes de todos os episódios, exiba-os
+        displayCharacterDetails(character, episodeDetails);
+    }
+
+
+    function displayCharacterDetails(character, episodeDetails) {
         document.getElementById("character-img").setAttribute("src", character.image);
         document.getElementById("character-name").textContent = character.name;
         document.getElementById("character-status").textContent = `Status: ${character.status}`;
         document.getElementById("character-gender").textContent = `Gênero: ${character.gender}`;
         document.getElementById("character-species").textContent = `Espécie: ${character.species}`;
         document.getElementById("character-location").textContent = `Localização: ${character.location.name}`;
+    
+        // Exibe a lista de nomes dos episódios
+        const episodeList = document.getElementById("character-episodes");
+        episodeList.innerHTML = `<h4>Episódios (${episodeDetails.length}):</h4>`;
+        const episodeNames = episodeDetails.map(episode => episode.name);
+        episodeNames.forEach(episodeName => {
+            const listItem = document.createElement("li");
+            listItem.textContent = episodeName;
+            episodeList.appendChild(listItem);
+        });
     }
 });
